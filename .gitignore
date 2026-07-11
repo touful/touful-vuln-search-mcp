@@ -1,0 +1,30 @@
+# 环境变量（含敏感信息，严禁提交）
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 虚拟环境
+.venv/
+venv/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# 测试报告（内部文档）
+report/
+
+# 安全删除工具日志
+.safe-delete/

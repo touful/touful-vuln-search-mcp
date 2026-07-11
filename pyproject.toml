@@ -1,0 +1,21 @@
+[project]
+name = "touful-vuln-search-mcp"
+version = "0.1.0"
+description = "统一漏洞搜索 MCP 服务，整合 NVD CVE 数据库查询与 OSV 开源漏洞查询"
+requires-python = ">=3.10"
+dependencies = [
+    "fastmcp>=3.2.4,<4.0",
+    "httpx[socks]>=0.27",
+    "python-dotenv>=1.0",
+    "aiolimiter>=1.1",
+]
+
+[project.scripts]
+touful-vuln-search = "src.server:main"
+
+[tool.setuptools.packages.find]
+exclude = ["tests", "tests.*", "docs", "docs.*"]
+
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"

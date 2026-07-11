@@ -1,0 +1,330 @@
+[
+  {
+    "cve_id": "CVE-2021-44228",
+    "has_metrics": true,
+    "cvssMetricV31": {
+      "count": 2,
+      "types": [
+        "Primary",
+        "Secondary"
+      ],
+      "first_type": "Primary",
+      "elem_0": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 10.0,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+      },
+      "elem_1": {
+        "type": "Secondary",
+        "source": "134c704f-9b21-4f2e-91b3-4a467353bcc0",
+        "baseScore": 10.0,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+      }
+    },
+    "cvssMetricV30": {
+      "count": 0,
+      "types": [],
+      "first_type": null
+    },
+    "cvssMetricV2": {
+      "count": 1,
+      "types": [
+        "Primary"
+      ],
+      "first_type": "Primary",
+      "elem_0": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 9.3,
+        "vectorString": "AV:N/AC:M/Au:N/C:C/I:C/A:C"
+      }
+    },
+    "summary": "cvssMetricV31: 2个元素, types=[Primary, Secondary] | cvssMetricV2: 1个元素, types=[Primary]"
+  },
+  {
+    "cve_id": "CVE-2024-3094",
+    "has_metrics": true,
+    "cvssMetricV31": {
+      "count": 2,
+      "types": [
+        "Secondary",
+        "Primary"
+      ],
+      "first_type": "Secondary",
+      "elem_0": {
+        "type": "Secondary",
+        "source": "secalert@redhat.com",
+        "baseScore": 10.0,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+      },
+      "elem_1": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 10.0,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+      }
+    },
+    "cvssMetricV30": {
+      "count": 0,
+      "types": [],
+      "first_type": null
+    },
+    "cvssMetricV2": {
+      "count": 0,
+      "types": [],
+      "first_type": null
+    },
+    "summary": "cvssMetricV31: 2个元素, types=[Secondary, Primary]"
+  },
+  {
+    "cve_id": "CVE-2017-0144",
+    "has_metrics": true,
+    "cvssMetricV31": {
+      "count": 2,
+      "types": [
+        "Primary",
+        "Secondary"
+      ],
+      "first_type": "Primary",
+      "elem_0": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 8.8,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+      },
+      "elem_1": {
+        "type": "Secondary",
+        "source": "134c704f-9b21-4f2e-91b3-4a467353bcc0",
+        "baseScore": 8.8,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+      }
+    },
+    "cvssMetricV30": {
+      "count": 0,
+      "types": [],
+      "first_type": null
+    },
+    "cvssMetricV2": {
+      "count": 1,
+      "types": [
+        "Primary"
+      ],
+      "first_type": "Primary",
+      "elem_0": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 9.3,
+        "vectorString": "AV:N/AC:M/Au:N/C:C/I:C/A:C"
+      }
+    },
+    "summary": "cvssMetricV31: 2个元素, types=[Primary, Secondary] | cvssMetricV2: 1个元素, types=[Primary]"
+  },
+  {
+    "cve_id": "CVE-2023-44487",
+    "has_metrics": true,
+    "cvssMetricV31": {
+      "count": 2,
+      "types": [
+        "Primary",
+        "Secondary"
+      ],
+      "first_type": "Primary",
+      "elem_0": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "elem_1": {
+        "type": "Secondary",
+        "source": "134c704f-9b21-4f2e-91b3-4a467353bcc0",
+        "baseScore": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      }
+    },
+    "cvssMetricV30": {
+      "count": 0,
+      "types": [],
+      "first_type": null
+    },
+    "cvssMetricV2": {
+      "count": 0,
+      "types": [],
+      "first_type": null
+    },
+    "summary": "cvssMetricV31: 2个元素, types=[Primary, Secondary]"
+  },
+  {
+    "cve_id": "CVE-2022-22965",
+    "has_metrics": true,
+    "cvssMetricV31": {
+      "count": 2,
+      "types": [
+        "Primary",
+        "Secondary"
+      ],
+      "first_type": "Primary",
+      "elem_0": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 9.8,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      },
+      "elem_1": {
+        "type": "Secondary",
+        "source": "134c704f-9b21-4f2e-91b3-4a467353bcc0",
+        "baseScore": 9.8,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      }
+    },
+    "cvssMetricV30": {
+      "count": 0,
+      "types": [],
+      "first_type": null
+    },
+    "cvssMetricV2": {
+      "count": 1,
+      "types": [
+        "Primary"
+      ],
+      "first_type": "Primary",
+      "elem_0": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 7.5,
+        "vectorString": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+      }
+    },
+    "summary": "cvssMetricV31: 2个元素, types=[Primary, Secondary] | cvssMetricV2: 1个元素, types=[Primary]"
+  },
+  {
+    "cve_id": "CVE-2020-1472",
+    "has_metrics": true,
+    "cvssMetricV31": {
+      "count": 2,
+      "types": [
+        "Secondary",
+        "Secondary"
+      ],
+      "first_type": "Secondary",
+      "elem_0": {
+        "type": "Secondary",
+        "source": "secure@microsoft.com",
+        "baseScore": 5.5,
+        "vectorString": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N"
+      },
+      "elem_1": {
+        "type": "Secondary",
+        "source": "nvd@nist.gov",
+        "baseScore": 10.0,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+      }
+    },
+    "cvssMetricV30": {
+      "count": 0,
+      "types": [],
+      "first_type": null
+    },
+    "cvssMetricV2": {
+      "count": 1,
+      "types": [
+        "Primary"
+      ],
+      "first_type": "Primary",
+      "elem_0": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 9.3,
+        "vectorString": "AV:N/AC:M/Au:N/C:C/I:C/A:C"
+      }
+    },
+    "summary": "cvssMetricV31: 2个元素, types=[Secondary, Secondary] | cvssMetricV2: 1个元素, types=[Primary]"
+  },
+  {
+    "cve_id": "CVE-2019-0708",
+    "has_metrics": true,
+    "cvssMetricV31": {
+      "count": 2,
+      "types": [
+        "Primary",
+        "Secondary"
+      ],
+      "first_type": "Primary",
+      "elem_0": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 9.8,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      },
+      "elem_1": {
+        "type": "Secondary",
+        "source": "134c704f-9b21-4f2e-91b3-4a467353bcc0",
+        "baseScore": 9.8,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      }
+    },
+    "cvssMetricV30": {
+      "count": 0,
+      "types": [],
+      "first_type": null
+    },
+    "cvssMetricV2": {
+      "count": 1,
+      "types": [
+        "Primary"
+      ],
+      "first_type": "Primary",
+      "elem_0": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 10.0,
+        "vectorString": "AV:N/AC:L/Au:N/C:C/I:C/A:C"
+      }
+    },
+    "summary": "cvssMetricV31: 2个元素, types=[Primary, Secondary] | cvssMetricV2: 1个元素, types=[Primary]"
+  },
+  {
+    "cve_id": "CVE-2017-5638",
+    "has_metrics": true,
+    "cvssMetricV31": {
+      "count": 2,
+      "types": [
+        "Primary",
+        "Secondary"
+      ],
+      "first_type": "Primary",
+      "elem_0": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 9.8,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      },
+      "elem_1": {
+        "type": "Secondary",
+        "source": "134c704f-9b21-4f2e-91b3-4a467353bcc0",
+        "baseScore": 9.8,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      }
+    },
+    "cvssMetricV30": {
+      "count": 0,
+      "types": [],
+      "first_type": null
+    },
+    "cvssMetricV2": {
+      "count": 1,
+      "types": [
+        "Primary"
+      ],
+      "first_type": "Primary",
+      "elem_0": {
+        "type": "Primary",
+        "source": "nvd@nist.gov",
+        "baseScore": 10.0,
+        "vectorString": "AV:N/AC:L/Au:N/C:C/I:C/A:C"
+      }
+    },
+    "summary": "cvssMetricV31: 2个元素, types=[Primary, Secondary] | cvssMetricV2: 1个元素, types=[Primary]"
+  }
+]
