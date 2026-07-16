@@ -37,6 +37,10 @@ async def check_tools():
         "osv_query_package",
         "osv_query_batch",
         "osv_get_vuln",
+        "get_epss_score",
+        "check_kev_status",
+        "search_exploit",
+        "assess_cve",
     ]
     actual_names = {t.name for t in tools}
     missing = set(expected) - actual_names
@@ -45,11 +49,11 @@ async def check_tools():
     if missing:
         print(f"[FAIL] 缺少工具: {missing}")
     else:
-        print(f"[OK] 所有 6 个工具已注册")
+        print(f"[OK] 所有 {len(expected)} 个工具已注册")
     if extra:
         print(f"[WARN] 额外工具: {extra}")
 
-    assert len(tools) >= 6, f"工具数量不足: {len(tools)}"
+    assert len(tools) >= len(expected), f"工具数量不足: {len(tools)}"
     assert not missing, f"缺少工具: {missing}"
     print("[OK] 验证通过!")
 

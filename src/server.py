@@ -343,6 +343,11 @@ async def app_lifespan(server: FastMCP):
                 await _refresh_task
             except asyncio.CancelledError:
                 pass
+        else:
+            # 任务已完成，检查是否有未捕获的异常
+            exc = _refresh_task.exception()
+            if exc is not None:
+                logger.error("后台刷新任务异常退出: %s", exc)
         # 清理 ExploitDB 内存缓存
         try:
             exploit_client.clear_cache()
