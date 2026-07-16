@@ -28,3 +28,6 @@ report/
 
 # 安全删除工具日志
 .safe-delete/
+
+# 本地数据缓存
+cache/

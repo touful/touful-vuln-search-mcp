@@ -16,11 +16,14 @@ from fastmcp import FastMCP, Context
 from fastmcp.tools.base import ToolAnnotations
 
 from src.config import NVD_API_KEY, GITHUB_TOKEN
+from src.config import KEV_CACHE_FILE, KEV_CACHE_TTL_HOURS
+from src.config import EXPLOITDB_CACHE_FILE, EXPLOITDB_CACHE_TTL_HOURS
 from src.clients.nvd_client import NVDClient
 from src.clients.osv_client import OSVClient
 from src.clients.epss_client import EPSSClient
 from src.clients.kev_client import KEVClient
 from src.clients.exploit_client import ExploitClient
+from src.cache import is_cache_fresh
 
 logger = logging.getLogger(__name__)
 
@@ -243,48 +246,104 @@ def _format_osv_vuln(vuln: dict) -> str:
 
 @asynccontextmanager
 async def app_lifespan(server: FastMCP):
-    """应用生命周期管理：初始化共享客户端并注入到上下文。
+    """应用生命周期管理：缓存优先加载 + 后台异步刷新。
 
-    在服务启动时创建 NVDClient、OSVClient、EPSSClient、
-    ExploitClient、KEVClient 实例，并加载 KEV 全量目录。
-    通过 lifespan_context 提供给所有工具函数访问。
-    服务关闭时自动清理资源。
+    yield 之前仅做本地磁盘 I/O（毫秒级），不发起任何网络请求；
+    网络下载放在 yield 之前创建的 asyncio.Task 后台执行，
+    确保服务启动在 1 秒内完成，不因网络波动阻塞。
     """
     nvd_client = NVDClient(api_key=NVD_API_KEY)
     osv_client = OSVClient()
     epss_client = EPSSClient()
     kev_client = KEVClient()
     exploit_client = ExploitClient(github_token=GITHUB_TOKEN)
-    # 启动时加载 KEV 全量目录到内存（失败时降级为空列表）
-    try:
-        kev_catalog = await kev_client.load_catalog()
+
+    # ── 仅本地磁盘 I/O（毫秒级） ──────────────────────────
+    kev_from_cache, _exploitdb_from_cache = await asyncio.gather(
+        kev_client.load_from_cache(),
+        exploit_client.load_from_cache(),
+    )
+
+    if kev_from_cache is not None:
+        kev_catalog = kev_from_cache
         kev_index = KEVClient.build_index(kev_catalog)
-    except Exception as e:
-        import warnings
-        warnings.warn(
-            f"KEV 目录加载失败: {e}，KEV 相关工具将返回不可用状态",
-            RuntimeWarning,
+        logger.info("KEV 从缓存加载，共 %d 条", len(kev_catalog))
+    else:
+        kev_catalog: list[dict] = []
+        kev_index: dict[str, dict] = {}
+
+    if _exploitdb_from_cache is not None:
+        exploit_client._csv_cache = _exploitdb_from_cache
+        logger.info(
+            "Exploit-DB 从缓存加载，共 %d 条", len(_exploitdb_from_cache)
         )
-        kev_catalog = []
-        kev_index = {}  # type: ignore[assignment]
-    # 启动时预加载 Exploit-DB CSV 到缓存（失败时降级为懒加载）
+
+    lifespan_ctx = {
+        "nvd_client": nvd_client,
+        "osv_client": osv_client,
+        "epss_client": epss_client,
+        "kev_client": kev_client,
+        "kev_catalog": kev_catalog,
+        "kev_index": kev_index,
+        "exploit_client": exploit_client,
+    }
+
+    # ── 后台刷新任务 ──────────────────────────
+    async def _background_refresh() -> None:
+        """后台异步刷新缓存（仅在过期或缺失时下载）。"""
+
+        async def _refresh_kev() -> None:
+            try:
+                new_catalog = await kev_client.fetch_and_save()
+                if new_catalog:
+                    lifespan_ctx["kev_catalog"] = new_catalog
+                    lifespan_ctx["kev_index"] = \
+                        KEVClient.build_index(new_catalog)
+                    logger.info(
+                        "KEV 后台刷新完成，共 %d 条", len(new_catalog)
+                    )
+            except Exception as e:
+                logger.warning("KEV 后台刷新失败: %s", e)
+
+        async def _refresh_exploitdb() -> None:
+            try:
+                await exploit_client.fetch_and_save()
+                logger.info("Exploit-DB 后台刷新完成")
+            except Exception as e:
+                logger.warning("Exploit-DB 后台刷新失败: %s", e)
+
+        refresh_ops: list = []
+        if (
+            kev_from_cache is None
+            or not is_cache_fresh(KEV_CACHE_FILE, KEV_CACHE_TTL_HOURS)
+        ):
+            refresh_ops.append(_refresh_kev())
+        if (
+            _exploitdb_from_cache is None
+            or not is_cache_fresh(
+                EXPLOITDB_CACHE_FILE, EXPLOITDB_CACHE_TTL_HOURS
+            )
+        ):
+            refresh_ops.append(_refresh_exploitdb())
+
+        if refresh_ops:
+            await asyncio.gather(*refresh_ops, return_exceptions=True)
+
+    # 在 yield 之前创建后台任务，确保服务运行期间并发执行
+    _refresh_task = asyncio.create_task(_background_refresh())
+
     try:
-        await exploit_client.load_exploitdb_csv()
-    except Exception:
-        logger.warning("Exploit-DB CSV 预加载失败，将降级为懒加载模式")
-    try:
-        yield {
-            "nvd_client": nvd_client,
-            "osv_client": osv_client,
-            "epss_client": epss_client,
-            "kev_client": kev_client,
-            "kev_catalog": kev_catalog,
-            "kev_index": kev_index,
-            "exploit_client": exploit_client,
-        }
+        yield lifespan_ctx
     finally:
         logger.info("MCP 服务资源清理中...")
-        # 清理 ExploitDB 缓存
+        # 取消尚未完成的后台刷新任务
+        if not _refresh_task.done():
+            _refresh_task.cancel()
+            try:
+                await _refresh_task
+            except asyncio.CancelledError:
+                pass
+        # 清理 ExploitDB 内存缓存
         try:
             exploit_client.clear_cache()
         except Exception:
