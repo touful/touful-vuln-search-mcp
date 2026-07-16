@@ -70,7 +70,11 @@ class KEVClient(BaseAPIClient):
         return data
 
     async def fetch_and_save(self) -> list[dict]:
-        """从 CISA 下载 KEV 全量数据并原子写入磁盘缓存。
+        """从 CISA 下载 KEV 全量数据并写入磁盘缓存。
+
+        内存数据优先：vulnerabilities 解析成功后即视为有效，
+        磁盘缓存写入失败仅记录日志，不影响返回值，
+        确保后台刷新时数据能正常更新到 lifespan_ctx。
 
         Returns:
             vulnerabilities 列表。
@@ -91,8 +95,11 @@ class KEVClient(BaseAPIClient):
             vulnerabilities = data.get("vulnerabilities", [])
         except (ValueError, KeyError) as e:
             raise RuntimeError(f"KEV 目录 JSON 解析失败: {e}") from e
-        await save_json_cache(KEV_CACHE_FILE, vulnerabilities)
-        logger.info("KEV 缓存已刷新到磁盘，共 %d 条", len(vulnerabilities))
+        try:
+            await save_json_cache(KEV_CACHE_FILE, vulnerabilities)
+            logger.info("KEV 缓存已刷新到磁盘，共 %d 条", len(vulnerabilities))
+        except Exception as e:
+            logger.warning("KEV 磁盘缓存写入失败: %s", e)
         return vulnerabilities
 
     @staticmethod

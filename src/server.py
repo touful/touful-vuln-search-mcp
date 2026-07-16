@@ -290,7 +290,19 @@ async def app_lifespan(server: FastMCP):
 
     # ── 后台刷新任务 ──────────────────────────
     async def _background_refresh() -> None:
-        """后台异步刷新缓存（仅在过期或缺失时下载）。"""
+        """后台异步刷新缓存（仅在过期或缺失时下载）。
+
+        并发安全说明：
+        本项目中不使用 asyncio.Lock 保护共享状态，原因如下：
+        1. asyncio 基于单线程事件循环模型，引用赋值
+           （如 lifespan_ctx["kev_catalog"] = new_catalog）是原子操作；
+        2. 后台刷新任务只写入共享变量，请求处理函数只读取共享变量，
+           不存在两个协程同时修改同一变量的情况；
+        3. exploit_client._csv_cache 同理——后台刷新通过
+           _download_parse_and_cache 写入，请求处理通过
+           _get_exploitdb_rows 读取，引用赋值同为原子操作；
+        4. 因此在单线程事件循环模型下无需加锁，不会出现竞态条件。
+        """
 
         async def _refresh_kev() -> None:
             try:
@@ -306,6 +318,9 @@ async def app_lifespan(server: FastMCP):
                 logger.warning("KEV 后台刷新失败: %s", e)
 
         async def _refresh_exploitdb() -> None:
+            # 注：fetch_and_save 内部已用 try-except 兜底所有 Exception，
+            #   正常不会传播异常至此；此处外层 try-except 作为防御性安全网，
+            #   覆盖未来内部重构导致异常层级变更等边缘情况。
             try:
                 await exploit_client.fetch_and_save()
                 logger.info("Exploit-DB 后台刷新完成")

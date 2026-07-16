@@ -257,6 +257,43 @@ async def test_kev_fetch_and_save():
         kev_mod.resilient_request = original_request
 
 
+async def test_kev_fetch_and_save_disk_write_failure():
+    """测试 KEVClient.fetch_and_save 磁盘写入失败仍返回数据（M-1 回归测试）"""
+    import src.clients.kev_client as kev_mod
+
+    original_request = kev_mod.resilient_request
+    original_save = kev_mod.save_json_cache  # 保存 kev_client 模块命名空间中的引用
+    try:
+        mock_catalog = [{"cveID": "CVE-2024-9999", "vendorProject": "Test"}]
+
+        class MockResponse:
+            status_code = 200
+            def json(self):
+                return {"vulnerabilities": mock_catalog}
+
+        async def mock_request(*args, **kwargs):
+            return MockResponse()
+
+        kev_mod.resilient_request = mock_request
+
+        # mock kev_client 模块命名空间中的 save_json_cache（而非 src.cache）
+        # 因为 fetch_and_save 调用的是本模块 import 的引用
+        async def mock_save_fail(*args, **kwargs):
+            raise OSError("磁盘写入失败（模拟）")
+
+        kev_mod.save_json_cache = mock_save_fail
+
+        from src.clients.kev_client import KEVClient
+
+        client = KEVClient()
+        result = await client.fetch_and_save()
+        _check("KEV 磁盘写入失败仍返回数据", result == mock_catalog,
+               f"期望 {mock_catalog}，得到 {result}")
+    finally:
+        kev_mod.resilient_request = original_request
+        kev_mod.save_json_cache = original_save
+
+
 # ==================== ExploitClient 测试 ====================
 
 
@@ -352,6 +389,46 @@ async def test_exploit_fetch_and_save():
         exploit_mod.resilient_request = original_request
 
 
+async def test_exploit_fetch_and_save_disk_write_failure():
+    """测试 ExploitClient.fetch_and_save 磁盘写入失败仍填充 _csv_cache（M-2 回归测试）"""
+    import src.clients.exploit_client as exploit_mod
+
+    original_request = exploit_mod.resilient_request
+    original_save = exploit_mod.save_text_cache  # 保存 exploit_client 模块命名空间中的引用
+    try:
+        class MockResponse:
+            status_code = 200
+            @property
+            def text(self):
+                return _CSV_CONTENT
+
+        async def mock_request(*args, **kwargs):
+            return MockResponse()
+
+        exploit_mod.resilient_request = mock_request
+
+        # mock exploit_client 模块命名空间中的 save_text_cache（而非 src.cache）
+        # 因为 fetch_and_save 调用的是本模块 import 的引用
+        async def mock_save_fail(*args, **kwargs):
+            raise OSError("磁盘写入失败（模拟）")
+
+        exploit_mod.save_text_cache = mock_save_fail
+
+        from src.clients.exploit_client import ExploitClient
+
+        client = ExploitClient()
+        await client.fetch_and_save()
+        _check("ExploitDB 磁盘写入失败仍填充 _csv_cache",
+               client._csv_cache is not None)
+        if client._csv_cache:
+            _check("ExploitDB 磁盘写入失败条目数正确",
+                   len(client._csv_cache) == 2,
+                   f"得到 {len(client._csv_cache)}")
+    finally:
+        exploit_mod.resilient_request = original_request
+        exploit_mod.save_text_cache = original_save
+
+
 # ==================== 运行全部测试 ====================
 
 
@@ -378,12 +455,14 @@ async def main():
     await test_kev_load_from_cache_miss()
     await test_kev_load_catalog_returns_empty()
     await test_kev_fetch_and_save()
+    await test_kev_fetch_and_save_disk_write_failure()
 
     print("\n── ExploitClient 缓存 ──")
     await test_exploit_load_from_cache_hit()
     await test_exploit_load_from_cache_miss()
     await test_exploit_load_exploitdb_csv_cache_hit()
     await test_exploit_fetch_and_save()
+    await test_exploit_fetch_and_save_disk_write_failure()
 
     # 总结
     total = _passed + _failed
